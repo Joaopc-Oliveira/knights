@@ -22,7 +22,8 @@ knowledge0 = And(
 knowledge1 = And(
     Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
     Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
-    Implication(AKnight, And(AKnave, BKnave))  # Se A é cavaleiro, ele diz a verdade sobre ambos serem patifes
+    Implication(AKnight, And(AKnave, BKnave)),  # Se A é cavaleiro, ele diz a verdade sobre ambos serem patifes
+    Implication(AKnave, Or(AKnight, BKnight))   # Se A é patife, então ele mente; A ou B precisam ser cavaleiros
 )
 
 # Puzzle 2
@@ -30,8 +31,8 @@ knowledge1 = And(
 knowledge2 = And(
     Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
     Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
-    Biconditional(AKnight, BKnight),  # A diz que ambos são do mesmo tipo
-    Biconditional(BKnight, Not(AKnight))  # B diz que são de tipos diferentes
+    Implication(AKnight, Biconditional(AKnight, BKnight)),  # A é cavaleiro e diz que ambos são do mesmo tipo
+    Implication(BKnight, Biconditional(AKnight, Not(BKnight)))  # B é cavaleiro e diz que são de tipos diferentes
 )
 
 # Puzzle 3
@@ -43,10 +44,10 @@ knowledge3 = And(
     Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
     Biconditional(CKnight, Not(CKnave)),  # C é cavaleiro se, e somente se, não é patife
 
-    Or(AKnight, AKnave),  # A diz que é cavaleiro ou patife
-    Implication(BKnight, Not(AKnight)),  # B diz que A disse "sou patife"
-    Implication(BKnight, CKnave),  # B diz que C é patife
-    Implication(CKnight, AKnight)  # C diz que A é cavaleiro
+    Or(AKnight, AKnave),                  # A diz que é cavaleiro ou patife
+    Implication(BKnight, Not(AKnight)),   # B diz que A disse "sou patife"
+    Implication(BKnight, CKnave),         # B diz que C é patife
+    Implication(CKnight, AKnight)         # C diz que A é cavaleiro
 )
 
 
