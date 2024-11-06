@@ -201,18 +201,3 @@ def model_check(knowledge, query):
     # Get all unique symbols from knowledge and query
     symbols = list(knowledge.symbols() | query.symbols())
     return evaluate_models(symbols, {})
-
-if __name__ == "__main__":
-    # Defina símbolos
-    A = Symbol("A")
-    B = Symbol("B")
-
-    # Crie uma base de conhecimento, por exemplo, que "A e B são verdadeiros"
-    knowledge = And(A, B)
-
-    # Defina uma consulta, como verificar se A é verdadeiro
-    query = A
-
-    # Verifique se a base de conhecimento implica a consulta
-    result = model_check(knowledge, query)
-    print(f"Knowledge entails query: {result}")
