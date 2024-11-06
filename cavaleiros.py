@@ -1,76 +1,202 @@
-from logic import *
-
-AKnight = Symbol("A is a Knight")
-AKnave = Symbol("A is a Knave")
-
-BKnight = Symbol("B is a Knight")
-BKnave = Symbol("B is a Knave")
-
-CKnight = Symbol("C is a Knight")
-CKnave = Symbol("C is a Knave")
-
-# Rules that apply to all puzzles
-# Each character can only be a Knight or a Knave, but not both
-characters = And(
-    Or(AKnight, AKnave), Not(And(AKnight, AKnave)),
-    Or(BKnight, BKnave), Not(And(BKnight, BKnave)),
-    Or(CKnight, CKnave), Not(And(CKnight, CKnave))
-)
-
-# Puzzle 0
-# A says "I am both a knight and a knave."
-knowledge0 = And(
-    characters,
-    Implication(AKnight, And(AKnight, AKnave))  # If A is a knight, then A must be both knight and knave, which is a contradiction
-)
-
-# Puzzle 1
-# A says "We are both knaves."
-# B says nothing.
-knowledge1 = And(
-    characters,
-    Implication(AKnight, And(AKnave, BKnave))  # If A is a knight, then both A and B must be knaves
-)
-
-# Puzzle 2
-# A says "We are the same kind."
-# B says "We are of different kinds."
-knowledge2 = And(
-    characters,
-    Implication(AKnight, Or(And(AKnight, BKnight), And(AKnave, BKnave))),  # If A is a knight, A and B are the same kind
-    Implication(BKnight, Or(And(AKnight, BKnave), And(AKnave, BKnight)))    # If B is a knight, A and B are of different kinds
-)
-
-# Puzzle 3
-# A says either "I am a knight." or "I am a knave.", but you don't know which.
-# B says "A said 'I am a knave'."
-# B says "C is a knave."
-# C says "A is a knight."
-knowledge3 = And(
-    characters,
-    Or(Implication(AKnight, AKnight), Implication(AKnight, AKnave)),  # A says either "I am a knight" or "I am a knave"
-    Implication(BKnight, AKnave),  # B says "A said 'I am a knave'"
-    Implication(BKnight, CKnave),  # B says "C is a knave"
-    Implication(CKnight, AKnight)  # C says "A is a knight"
-)
-
-def main():
-    symbols = [AKnight, AKnave, BKnight, BKnave, CKnight, CKnave]
-    puzzles = [
-        ("Puzzle 0", knowledge0),
-        ("Puzzle 1", knowledge1),
-        ("Puzzle 2", knowledge2),
-        ("Puzzle 3", knowledge3)
-    ]
-    for puzzle, knowledge in puzzles:
-        print(puzzle)
-        if len(knowledge.conjuncts) == 0:
-            print("    Not yet implemented.")
-        else:
-            for symbol in symbols:
-                if model_check(knowledge, symbol):
-                    print(f"    {symbol}")
+import itertools
+from functools import lru_cache
+import re
 
 
-if __name__ == "__main__":
-    main()
+class Sentence:
+    """Base for logical sentences with common methods."""
+
+    @lru_cache(maxsize=None)
+    def evaluate(self, model):
+        """Evaluates the logical sentence in a given model."""
+        raise NotImplementedError("Must implement evaluate in subclass")
+
+    def formula(self):
+        """Returns a string formula representing the logical sentence."""
+        return ""
+
+    def symbols(self):
+        """Returns a set of all symbols in the logical sentence."""
+        return set()
+
+    @classmethod
+    def validate(cls, sentence):
+        if not isinstance(sentence, Sentence):
+            raise TypeError("Must be a logical sentence")
+
+    @classmethod
+    def parenthesize(cls, s):
+        """Adds parentheses to an expression only if necessary."""
+        return s if re.match(r"^[a-zA-Z0-9_()]+$", s) else f"({s})"
+
+
+class Symbol(Sentence):
+    def __init__(self, name):
+        self.name = name
+
+    def __eq__(self, other):
+        return isinstance(other, Symbol) and self.name == other.name
+
+    def __hash__(self):
+        return hash(("symbol", self.name))
+
+    def __repr__(self):
+        return self.name
+
+    def evaluate(self, model):
+        return model.get(self.name, False)
+
+    def formula(self):
+        return self.name
+
+    def symbols(self):
+        return {self.name}
+
+
+class Not(Sentence):
+    def __init__(self, operand):
+        Sentence.validate(operand)
+        self.operand = operand
+
+    def __eq__(self, other):
+        return isinstance(other, Not) and self.operand == other.operand
+
+    def __hash__(self):
+        return hash(("not", hash(self.operand)))
+
+    def __repr__(self):
+        return f"Not({self.operand})"
+
+    def evaluate(self, model):
+        return not self.operand.evaluate(model)
+
+    def formula(self):
+        return "¬" + Sentence.parenthesize(self.operand.formula())
+
+    def symbols(self):
+        return self.operand.symbols()
+
+
+class And(Sentence):
+    def __init__(self, *conjuncts):
+        for conjunct in conjuncts:
+            Sentence.validate(conjunct)
+        self.conjuncts = list(conjuncts)
+
+    def __eq__(self, other):
+        return isinstance(other, And) and self.conjuncts == other.conjuncts
+
+    def __hash__(self):
+        return hash(("and", tuple(hash(conjunct) for conjunct in self.conjuncts)))
+
+    def __repr__(self):
+        return f"And({', '.join(map(str, self.conjuncts))})"
+
+    def evaluate(self, model):
+        return all(conjunct.evaluate(model) for conjunct in self.conjuncts)
+
+    def formula(self):
+        return " ∧ ".join(Sentence.parenthesize(conjunct.formula()) for conjunct in self.conjuncts)
+
+    def symbols(self):
+        return set.union(*[conjunct.symbols() for conjunct in self.conjuncts])
+
+
+class Or(Sentence):
+    def __init__(self, *disjuncts):
+        for disjunct in disjuncts:
+            Sentence.validate(disjunct)
+        self.disjuncts = list(disjuncts)
+
+    def __eq__(self, other):
+        return isinstance(other, Or) and self.disjuncts == other.disjuncts
+
+    def __hash__(self):
+        return hash(("or", tuple(hash(disjunct) for disjunct in self.disjuncts)))
+
+    def __repr__(self):
+        return f"Or({', '.join(map(str, self.disjuncts))})"
+
+    def evaluate(self, model):
+        return any(disjunct.evaluate(model) for disjunct in self.disjuncts)
+
+    def formula(self):
+        return " ∨ ".join(Sentence.parenthesize(disjunct.formula()) for disjunct in self.disjuncts)
+
+    def symbols(self):
+        return set.union(*[disjunct.symbols() for disjunct in self.disjuncts])
+
+
+class Implication(Sentence):
+    def __init__(self, antecedent, consequent):
+        Sentence.validate(antecedent)
+        Sentence.validate(consequent)
+        self.antecedent = antecedent
+        self.consequent = consequent
+
+    def __eq__(self, other):
+        return isinstance(other,
+                          Implication) and self.antecedent == other.antecedent and self.consequent == other.consequent
+
+    def __hash__(self):
+        return hash(("implies", hash(self.antecedent), hash(self.consequent)))
+
+    def __repr__(self):
+        return f"Implication({self.antecedent}, {self.consequent})"
+
+    def evaluate(self, model):
+        return not self.antecedent.evaluate(model) or self.consequent.evaluate(model)
+
+    def formula(self):
+        antecedent = Sentence.parenthesize(self.antecedent.formula())
+        consequent = Sentence.parenthesize(self.consequent.formula())
+        return f"{antecedent} => {consequent}"
+
+    def symbols(self):
+        return self.antecedent.symbols() | self.consequent.symbols()
+
+
+class Biconditional(Sentence):
+    def __init__(self, left, right):
+        Sentence.validate(left)
+        Sentence.validate(right)
+        self.left = left
+        self.right = right
+
+    def __eq__(self, other):
+        return isinstance(other, Biconditional) and self.left == other.left and self.right == other.right
+
+    def __hash__(self):
+        return hash(("biconditional", hash(self.left), hash(self.right)))
+
+    def __repr__(self):
+        return f"Biconditional({self.left}, {self.right})"
+
+    def evaluate(self, model):
+        left_eval = self.left.evaluate(model)
+        right_eval = self.right.evaluate(model)
+        return left_eval == right_eval
+
+    def formula(self):
+        left = Sentence.parenthesize(self.left.formula())
+        right = Sentence.parenthesize(self.right.formula())
+        return f"{left} <=> {right}"
+
+    def symbols(self):
+        return self.left.symbols() | self.right.symbols()
+
+
+def model_check(knowledge, query):
+    """Returns True if the knowledge base entails the query."""
+
+    def evaluate_models(symbols, model):
+        """Recursively evaluate all possible models of symbols."""
+        if not symbols:
+            return not knowledge.evaluate(model) or query.evaluate(model)
+        p, *remaining = symbols
+        return (evaluate_models(remaining, {**model, p: True}) and
+                evaluate_models(remaining, {**model, p: False}))
+
+    # Get all unique symbols from knowledge and query
+    symbols = list(knowledge.symbols() | query.symbols())
+    return evaluate_models(symbols, {})
