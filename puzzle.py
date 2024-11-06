@@ -1,4 +1,4 @@
-from cavaleiros import *  # Certifique-se de que cavaleiros.py contém todas as classes necessárias.
+from logic import *  # Importa classes e funções de lógica proposicional do logic.py
 
 # Definição de símbolos para representar cada personagem
 AKnight = Symbol("A is a Knight")
@@ -14,35 +14,35 @@ CKnave = Symbol("C is a Knave")
 # A diz "Eu sou ambos um cavaleiro e um patife."
 knowledge0 = And(
     Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
-    Implication(AKnight, And(AKnight, AKnave))  # Se A é cavaleiro, ele diz a verdade, mas isso é uma contradição
+    Implication(AKnight, And(AKnight, AKnave))  # Se A é cavaleiro, ele fala a verdade, o que é uma contradição
 )
 
 # Puzzle 1
 # A diz "Nós somos ambos patifes." B não diz nada.
 knowledge1 = And(
-    Biconditional(AKnight, Not(AKnave)),
-    Biconditional(BKnight, Not(BKnave)),
-    Implication(AKnight, And(AKnave, BKnave))  # Se A é cavaleiro, ele diz a verdade que ambos são patifes
+    Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
+    Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
+    Implication(AKnight, And(AKnave, BKnave))  # Se A é cavaleiro, ele diz a verdade sobre ambos serem patifes
 )
 
 # Puzzle 2
 # A diz "Nós somos do mesmo tipo." B diz "Nós somos de tipos diferentes."
 knowledge2 = And(
-    Biconditional(AKnight, Not(AKnave)),
-    Biconditional(BKnight, Not(BKnave)),
+    Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
+    Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
     Biconditional(AKnight, BKnight),  # A diz que ambos são do mesmo tipo
     Biconditional(BKnight, Not(AKnight))  # B diz que são de tipos diferentes
 )
 
 # Puzzle 3
-# A diz "Eu sou cavaleiro" ou "Eu sou patife". 
+# A diz "Eu sou cavaleiro" ou "Eu sou patife".
 # B diz "A disse que é patife" e "C é patife".
 # C diz "A é cavaleiro".
 knowledge3 = And(
-    Biconditional(AKnight, Not(AKnave)),
-    Biconditional(BKnight, Not(BKnave)),
-    Biconditional(CKnight, Not(CKnave)),
-    
+    Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
+    Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
+    Biconditional(CKnight, Not(CKnave)),  # C é cavaleiro se, e somente se, não é patife
+
     Or(AKnight, AKnave),  # A diz que é cavaleiro ou patife
     Implication(BKnight, Not(AKnight)),  # B diz que A disse "sou patife"
     Implication(BKnight, CKnave),  # B diz que C é patife
