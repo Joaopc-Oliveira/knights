@@ -34,15 +34,20 @@ knowledge2 = And(
     Implication(BKnave, Biconditional(AKnight, BKnight))
 )
 
-# Puzzle 3
 knowledge3 = And(
-    Biconditional(AKnight, Not(AKnave)),
-    Biconditional(BKnight, Not(BKnave)),
-    Biconditional(CKnight, Not(CKnave)),
+    Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
+    Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
+    Biconditional(CKnight, Not(CKnave)),  # C é cavaleiro se, e somente se, não é patife
 
-    Or(AKnight, AKnave),
-    Implication(BKnight, Not(AKnight)),
+    Or(AKnight, AKnave),  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
+
+    # Se B é cavaleiro, ele diz a verdade sobre A ter dito "Eu sou patife"
+    Implication(BKnight, Biconditional(AKnave, True)),
+
+    # Se B é cavaleiro, ele também diz a verdade sobre C ser patife
     Implication(BKnight, CKnave),
+
+    # Se C é cavaleiro, ele diz a verdade sobre A ser cavaleiro
     Implication(CKnight, AKnight)
 )
 
