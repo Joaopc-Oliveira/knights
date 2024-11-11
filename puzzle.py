@@ -42,7 +42,7 @@ knowledge3 = And(
     Or(AKnight, AKnave),  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
 
     # Se B é cavaleiro, ele diz a verdade sobre A ter dito "Eu sou patife"
-    Implication(BKnight, Biconditional(AKnave, True)),
+    Implication(BKnight, AKnave),
 
     # Se B é cavaleiro, ele também diz a verdade sobre C ser patife
     Implication(BKnight, CKnave),
