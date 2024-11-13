@@ -39,16 +39,18 @@ knowledge3 = And(
     Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
     Biconditional(CKnight, Not(CKnave)),  # C é cavaleiro se, e somente se, não é patife
 
-    Or(AKnight, AKnave),  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
+    Or(AKnight, AKnave),                  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
 
-    # Se B é cavaleiro, ele diz a verdade sobre A ter dito "Eu sou patife"
-    Implication(BKnight, AKnave),
+    # Declarações de B:
+    Implication(BKnight, AKnave),         # Se B é cavaleiro, ele diz que A disse "Eu sou patife."
+    Implication(BKnight, CKnave),         # Se B é cavaleiro, ele diz que C é patife
 
-    # Se B é cavaleiro, ele também diz a verdade sobre C ser patife
-    Implication(BKnight, CKnave),
+    # Se B é patife, ele mente
+    Implication(BKnave, AKnight),         # Se B é patife, então A disse "Eu sou cavaleiro."
+    Implication(BKnave, CKnight),         # Se B é patife, então C é cavaleiro
 
-    # Se C é cavaleiro, ele diz a verdade sobre A ser cavaleiro
-    Implication(CKnight, AKnight)
+    # Declaração de C:
+    Implication(CKnight, AKnight)         # Se C é cavaleiro, ele diz que A é cavaleiro
 )
 
 
