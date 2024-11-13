@@ -41,10 +41,6 @@ knowledge3 = And(
 
     Or(AKnight, AKnave),                  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
 
-    # Declarações de B:
-    Implication(BKnight, AKnave),         # Se B é cavaleiro, ele diz que A disse "Eu sou patife."
-    Implication(BKnight, CKnave),         # Se B é cavaleiro, ele diz que C é patife
-
     # Se B é patife, ele mente
     Implication(BKnave, AKnight),         # Se B é patife, então A disse "Eu sou cavaleiro."
     Implication(BKnave, CKnight),         # Se B é patife, então C é cavaleiro
