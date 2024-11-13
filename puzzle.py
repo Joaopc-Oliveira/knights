@@ -35,20 +35,29 @@ knowledge2 = And(
 )
 
 knowledge3 = And(
-    Biconditional(AKnight, Not(AKnave)),  # A é cavaleiro se, e somente se, não é patife
-    Biconditional(BKnight, Not(BKnave)),  # B é cavaleiro se, e somente se, não é patife
-    Biconditional(CKnight, Not(CKnave)),  # C é cavaleiro se, e somente se, não é patife
-
-    Or(AKnight, AKnave),                  # A diz "Eu sou cavaleiro ou patife" (sempre verdadeiro)
-
-    # Se B é patife, ele mente
-    Implication(BKnave, AKnight),         # Se B é patife, então A disse "Eu sou cavaleiro."
-    Implication(BKnave, CKnight),         # Se B é patife, então C é cavaleiro
-
-    # Declaração de C:
-    Implication(CKnight, AKnight)         # Se C é cavaleiro, ele diz que A é cavaleiro
+    # A, B and C are knights or knaves but not both:
+    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
+    And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
+    And(Or(CKnight, CKnave), Not(And(CKnight, CKnave))),
+    # If B is a knight, A said 'I am a knave', and C is a knave:
+    Implication(BKnight, CKnave),
+    Implication(BKnight, And(
+      # A then said 'I am a Knave', A may be a Knight or a Knave:
+      Implication(AKnight, AKnave),
+      Implication(AKnave, Not(AKnave)),
+    )),
+    # If B is a knave, A said 'I am a knight' C is not a knave:
+    Implication(BKnave, Not(CKnave)),
+    Implication(BKnave, And(
+      # A then said 'I am a Knight', A may be a Knight or a Knave:
+      Implication(AKnight, AKnight),
+      Implication(AKnave, Not(AKnight))
+    )),
+    # If C is a knight, A is a knight:
+    Implication(CKnight, AKnight),
+    # If C is a knave, A is not a knight:
+    Implication(CKnave, Not(AKnight))
 )
-
 
 def main():
     symbols = [AKnight, AKnave, BKnight, BKnave, CKnight, CKnave]
