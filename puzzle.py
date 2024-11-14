@@ -1,6 +1,6 @@
-from logic import *  # Importa classes e funções de lógica proposicional do logic.py
+from logic import *
 
-# Definição de símbolos para representar cada personagem
+
 AKnight = Symbol("A is a Knight")
 AKnave = Symbol("A is a Knave")
 
@@ -52,13 +52,20 @@ knowledge3 = And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
     Biconditional(CKnight, Not(CKnave)),
+# A says either “I am a knight.” or “I am a knave.”, but you don’t know which.
     Or(AKnight, AKnave),
-    Implication(BKnight, And(
-        Biconditional(CKnave, AKnave),
-        And(AKnave, AKnight))),
-    Implication(BKnave, And(CKnight, Implication(CKnight, AKnight))),
-    Implication(CKnight, And(AKnight,BKnave)),
-    Implication(CKnave,And(AKnave, BKnight, Implication(AKnave, AKnight)))
+
+# B says “A said ‘I am a knave.’”
+    Implication(AKnight,BKnave),
+    Implication(AKnave, BKnight),
+
+# B then says “C is a knave.”
+    Implication(BKnight, CKnave),
+    Implication(BKnave, CKnight),
+
+# C says “A is a knight.”
+    Implication(CKnight, AKnight),
+    Implication(CKnave, AKnight)
 
 )
 
