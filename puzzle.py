@@ -44,10 +44,6 @@ knowledge2 =  And(
 
 )
 # Puzzle 3 has three characters: A, B, and C.
-# A says either “I am a knight.” or “I am a knave.”, but you don’t know which.
-# B says “A said ‘I am a knave.’”
-# B then says “C is a knave.”
-# C says “A is a knight.”
 knowledge3 = And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
@@ -56,8 +52,8 @@ knowledge3 = And(
     Or(AKnight, AKnave),
 
 # B says “A said ‘I am a knave.’”
-    Implication(AKnight,BKnave),
-    Implication(AKnave, BKnight),
+    Implication(BKnave,AKnight),
+    Implication(BKnight, AKnave),
 
 # B then says “C is a knave.”
     Implication(BKnight, CKnave),
@@ -66,7 +62,6 @@ knowledge3 = And(
 # C says “A is a knight.”
     Implication(CKnight, AKnight),
     Implication(CKnave, AKnight)
-
 )
 
 def main():
