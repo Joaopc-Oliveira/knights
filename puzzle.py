@@ -36,7 +36,7 @@ knowledge2 =  And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
     Implication(AKnight, BKnight),
-    Implication(AKnave, Or(AKnight, BKnight)),
+    Implication(AKnave, Or(AKnight, BKnight)) )
 # Puzzle 3 has three characters: A, B, and C.
 # A says either “I am a knight.” or “I am a knave.”, but you don’t know which.
 # B says “A said ‘I am a knave.’”
