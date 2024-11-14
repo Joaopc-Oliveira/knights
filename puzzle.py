@@ -52,7 +52,7 @@ knowledge3 = And(
     Implication(BKnight,And( AKnight,(Biconditional(CKnave,AKnave)))),
     Implication(BKnave,And(BKnight,CKnight)),
     Implication(CKnight, And(AKnight,BKnave)),
-    Implication(CKnave,And(AKnave,AKnight))
+    Implication(CKnave,And(AKnave,AKnight, BKnight))
 
 )
 
