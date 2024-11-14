@@ -11,12 +11,17 @@ CKnight = Symbol("C is a Knight")
 CKnave = Symbol("C is a Knave")
 
 # Puzzle 0
+#Puzzle 0 is the puzzle from the Background. It contains a single character, A.
+#A says “I am both a knight and a knave.”
 knowledge0 = And(
     Biconditional(AKnight, Not(AKnave)),
     Implication(AKnight, And(AKnight, AKnave))
 )
 
-# Puzzle 1
+
+# Puzzle 1 has two characters: A and B.
+# A says “We are both knaves.”
+# B says nothing.
 knowledge1 = And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
@@ -24,16 +29,19 @@ knowledge1 = And(
     Implication(AKnave, Or(AKnight, BKnight))
 )
 
-# Puzzle 2
-knowledge2 = And(
+# Puzzle 2 has two characters: A and B.
+# A says “We are the same kind.”
+# B says “We are of different kinds.”
+knowledge2 =  And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
-    Implication(AKnight, Biconditional(AKnight, BKnight)),
-    Implication(AKnave, Not(Biconditional(AKnight, BKnight))),
-    Implication(BKnight, Not(Biconditional(AKnight, BKnight))),
-    Implication(BKnave, Biconditional(AKnight, BKnight))
-)
-
+    Implication(AKnight, BKnight),
+    Implication(AKnave, Or(AKnight, BKnight)),
+# Puzzle 3 has three characters: A, B, and C.
+# A says either “I am a knight.” or “I am a knave.”, but you don’t know which.
+# B says “A said ‘I am a knave.’”
+# B then says “C is a knave.”
+# C says “A is a knight.”
 knowledge3 = And(
     # A, B and C are knights or knaves but not both:
     And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
