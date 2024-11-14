@@ -26,8 +26,10 @@ knowledge1 = And(
     Biconditional(AKnight, Not(AKnave)),
     Biconditional(BKnight, Not(BKnave)),
     Implication(AKnight, And(AKnave, BKnave)),
-    Implication(AKnave, Or(AKnight, BKnight))
+    Implication(AKnave, BKnight)
 )
+
+
 
 # Puzzle 2 has two characters: A and B.
 # A says “We are the same kind.”
